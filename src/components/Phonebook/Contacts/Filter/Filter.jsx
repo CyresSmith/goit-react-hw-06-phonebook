@@ -1,9 +1,19 @@
+import { ImFilter } from 'react-icons/im';
+import { useDispatch } from 'react-redux';
+
 import { Label, Input } from './Filter.styled';
+import { setFilterValue } from 'redux/filterSlice';
 import Box from 'components/shared/Box';
 import theme from 'theme';
-import { ImFilter } from 'react-icons/im';
 
-const Filter = ({ onChange }) => {
+const Filter = () => {
+  const dispatch = useDispatch();
+
+  const handleFilterChange = e => {
+    const value = e.currentTarget.value.toLowerCase().trim();
+    dispatch(setFilterValue(value));
+  };
+
   return (
     <Box
       display="flex"
@@ -20,7 +30,7 @@ const Filter = ({ onChange }) => {
           id="filter"
           name="filter"
           placeholder="Contact name"
-          onChange={onChange}
+          onChange={handleFilterChange}
         />
       </Box>
     </Box>

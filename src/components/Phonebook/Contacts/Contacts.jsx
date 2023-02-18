@@ -1,3 +1,8 @@
+import { IoMdPerson, IoIosCall } from 'react-icons/io';
+import { MdPersonRemoveAlt1 } from 'react-icons/md';
+import { useDispatch, useSelector } from 'react-redux';
+import { Notify } from 'notiflix/build/notiflix-notify-aio';
+
 import {
   ContactsList,
   Contact,
@@ -5,16 +10,38 @@ import {
   Phone,
   DeletBtn,
 } from './Contacts.styled';
-import { IoMdPerson, IoIosCall } from 'react-icons/io';
-import { MdPersonRemoveAlt1 } from 'react-icons/md';
-
 import Box from 'components/shared/Box';
 import theme from 'theme';
+import { getContacts, getFilters } from 'redux/selectors';
+import { removeContact } from 'redux/contactsSlice';
 
-const Contacts = ({ contacts, onRemove }) => {
+const Contacts = () => {
+  const dispatch = useDispatch();
+  const contacts = useSelector(getContacts);
+  const filters = useSelector(getFilters);
+
+  const handleContactRemove = id => dispatch(removeContact(id));
+
+  const visibleСontacts = (value, contacts) => {
+    if (value) {
+      const visibleСontacts = contacts.filter(({ name }) =>
+        name.toLowerCase().includes(value)
+      );
+      if (visibleСontacts.length === 0) {
+        Notify.failure('No contacts with this name', {
+          showOnlyTheLastOne: true,
+          position: 'right-bottom',
+        });
+      } else {
+        return visibleСontacts;
+      }
+    }
+    return contacts;
+  };
+
   return (
     <ContactsList>
-      {contacts.map(contact => {
+      {visibleСontacts(filters.filterValue, contacts).map(contact => {
         const { id, name, number } = contact;
         return (
           <Contact key={id}>
@@ -29,7 +56,7 @@ const Contacts = ({ contacts, onRemove }) => {
               </Box>
             </Box>
 
-            <DeletBtn onClick={() => onRemove(id)}>
+            <DeletBtn onClick={() => handleContactRemove(id)}>
               <MdPersonRemoveAlt1 size={20} color={theme.colors.white} />
             </DeletBtn>
           </Contact>

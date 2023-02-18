@@ -1,8 +1,11 @@
 import { Formik, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { nanoid } from 'nanoid';
+import { useDispatch } from 'react-redux';
 import { IoIosCall, IoMdPerson, IoMdPersonAdd } from 'react-icons/io';
+
 import { PhonebookForm as Form, Input, Label, Error } from './Form.styled';
+import { addContact } from 'redux/contactsSlice';
 import Box from 'components/shared/Box';
 import Button from 'components/shared/Button';
 import theme from 'theme';
@@ -12,22 +15,19 @@ const phoneRegExp =
 
 const ValidationSchema = Yup.object().shape({
   firstName: Yup.string()
-    .lowercase()
-    .trim()
     .min(2, 'Too Short!')
     .max(20, 'Too Long!')
     .required('Required'),
-  lastName: Yup.string()
-    .lowercase()
-    .trim()
-    .min(2, 'Too Short!')
-    .max(20, 'Too Long!'),
+  lastName: Yup.string().min(2, 'Too Short!').max(20, 'Too Long!'),
   tel: Yup.string()
     .matches(phoneRegExp, 'Number is not valid')
     .required('Required'),
 });
 
-const AddContactForm = ({ onAddContact }) => {
+const AddContactForm = () => {
+  const dispatch = useDispatch();
+  const handleContactAdd = contact => dispatch(addContact(contact));
+
   return (
     <Formik
       initialValues={{
@@ -50,7 +50,7 @@ const AddContactForm = ({ onAddContact }) => {
           number: tel.trim(),
         };
 
-        onAddContact(contact);
+        handleContactAdd(contact);
         resetForm();
       }}
     >
